@@ -14,7 +14,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -112,6 +114,20 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ApiErrorResponse("Desk is already booked for this date"));
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElse(null);
+
+        if (booking == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiErrorResponse("Booking not found"));
+        }
+
+        bookingRepository.delete(booking);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

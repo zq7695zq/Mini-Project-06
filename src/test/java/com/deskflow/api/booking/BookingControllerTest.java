@@ -1,5 +1,6 @@
 package com.deskflow.api.booking;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,4 +103,17 @@ class BookingControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Desk is already booked for this date"));
     }
+
+                  @Test
+                  void shouldCancelBooking() throws Exception {
+                    mockMvc.perform(delete("/api/bookings/{id}", 1))
+                        .andExpect(status().isNoContent());
+                  }
+
+                  @Test
+                  void shouldReturnNotFoundWhenCancellingMissingBooking() throws Exception {
+                    mockMvc.perform(delete("/api/bookings/{id}", 999))
+                        .andExpect(status().isNotFound())
+                        .andExpect(jsonPath("$.error").value("Booking not found"));
+                  }
 }
