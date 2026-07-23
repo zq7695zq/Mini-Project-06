@@ -9,7 +9,7 @@
 
 ## 启动服务
 
-默认会连接项目里已经配置好的目标 MySQL 数据库，并自动执行 `schema.sql` 和 `data.sql`。
+默认使用本地 `local` profile，通过 H2 内存数据库启动，并自动执行 `schema.sql` 和 `data.sql`。
 
 Windows:
 
@@ -17,7 +17,7 @@ Windows:
 .\mvnw.cmd spring-boot:run
 ```
 
-如果你只想在本地用 H2 启动测试环境：
+如果你想显式指定本地 H2 profile：
 
 ```powershell
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
@@ -25,7 +25,7 @@ Windows:
 
 ## 在 GitHub Codespaces 启动
 
-项目默认 profile 是 `codespace`，在 Codespaces 终端里直接运行：
+Codespaces 需要显式使用 `codespace` profile，在 Codespaces 终端里运行：
 
 ```bash
 ./mvnw spring-boot:run

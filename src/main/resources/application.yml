@@ -2,7 +2,7 @@ spring:
   application:
     name: deskflow-api
   profiles:
-    default: codespace
+    default: local
 
 server:
   port: ${SERVER_PORT:8080}
