@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://ndecb-23-97-62-135.run.pinggy-free.link:35869/appdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:appuser}
+    password: ${DB_PASSWORD:AppPass_2026!}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:5000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT:3000}
+      initialization-fail-timeout: ${DB_INIT_FAIL_TIMEOUT:5000}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+
+app:
+  database:
+    note: Default startup points to the shared target MySQL database and can still be overridden with DB_URL, DB_USERNAME, and DB_PASSWORD.
