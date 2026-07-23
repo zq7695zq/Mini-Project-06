@@ -1,6 +1,11 @@
 package com.deskflow.api.booking;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,9 +14,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deskflow.api.common.ApiErrorResponse;
@@ -30,6 +37,45 @@ public class BookingController {
     public BookingController(BookingRepository bookingRepository, DeskRepository deskRepository) {
         this.bookingRepository = bookingRepository;
         this.deskRepository = deskRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getBookingsByDate(@RequestParam(required = false) String date) {
+        if (date == null || date.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiErrorResponse("Missing required parameter: date (format: yyyy-MM-dd)"));
+        }
+
+        LocalDate bookingDate;
+        try {
+            bookingDate = LocalDate.parse(date);
+        } catch (DateTimeParseException exception) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiErrorResponse("Invalid date format. Expected: yyyy-MM-dd, received: " + date));
+        }
+
+        List<Map<String, Object>> bookings = bookingRepository.findAllByBookingDateOrderByDesk_CodeAsc(bookingDate)
+                .stream()
+                .map(booking -> {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("id", booking.getId());
+                    row.put("deskId", booking.getDesk().getId());
+                    row.put("deskCode", booking.getDesk().getCode());
+                    row.put("floor", booking.getDesk().getFloor());
+                    row.put("employeeName", booking.getEmployeeName());
+                    row.put("bookingDate", booking.getBookingDate().toString());
+                    row.put("createdAt", booking.getCreatedAt().toString());
+                    return row;
+                })
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("date", bookingDate.toString());
+        response.put("message", bookings.isEmpty()
+                ? "当前日期 " + bookingDate + " 暂无任何预定记录"
+                : "共找到 " + bookings.size() + " 条预定记录");
+        response.put("bookings", bookings);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
