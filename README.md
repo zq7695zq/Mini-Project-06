@@ -23,6 +23,32 @@ Windows:
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 
+## 在 GitHub Codespaces 启动
+
+项目默认 profile 是 `codespace`，在 Codespaces 终端里直接运行：
+
+```bash
+./mvnw spring-boot:run
+```
+
+如果你想显式指定 profile：
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=codespace
+```
+
+启动后在 Codespaces 的 `Ports` 面板确认 `8080` 已转发，然后访问：
+
+```text
+https://<your-codespace>-8080.app.github.dev/api/health
+```
+
+如果 Codespaces 无法连接默认 MySQL，可以先使用本地 H2 profile 验证服务：
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
 ## 检查服务
 
 启动后访问：
